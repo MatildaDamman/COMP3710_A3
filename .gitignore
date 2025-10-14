@@ -19,6 +19,11 @@ siim-isic-melanoma-classification.zip.download/
 *.npy
 *.npz
 
+# Allow README images
+!**/dataset_samples.png
+!**/siamese_pairs.png
+!**/*_visualization.png
+
 # Python
 __pycache__/
 *.py[cod]
