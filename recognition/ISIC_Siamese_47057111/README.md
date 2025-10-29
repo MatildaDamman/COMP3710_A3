@@ -1,225 +1,2229 @@
-# ISIC 2020 Siamese Network Melanoma Classifier
+# COMP3710 Assignment 3 - ISIC 2020 Melanoma Classification# COMP3710 Assignment 3 - ISIC 2020 Melanoma Classification# Advanced Siamese Melanoma Classifier
 
-A deep learning solution for melanoma detection using Siamese neural networks on the ISIC 2020 Kaggle Challenge dataset.
+## Advanced Siamese Network Approach
 
-## Overview
 
-This project implements a **Siamese Network** for binary classification of dermoscopic images to distinguish between normal skin lesions and melanoma. The approach uses one-shot learning techniques to achieve robust classification performance on the highly imbalanced ISIC 2020 dataset.
 
-### Problem Statement
-- **Dataset**: ISIC 2020 Kaggle Challenge dermoscopic images
-- **Task**: Binary classification (Normal vs Melanoma)  
-- **Challenge**: Severe class imbalance (98.8% normal, 1.2% melanoma)
-- **Target**: ~80% accuracy on test set
-- **Difficulty**: Hard (COMP3710 Project 9)
+**Author:** Student ID 47057111  
 
-## Algorithm Description
+**Course:** COMP3710 - Pattern Recognition and Analysis  ## Advanced Siamese Network Approach**COMP3710: Pattern Analysis and Machine Intelligence**  
 
-### Siamese Network Architecture
-Siamese networks learn to distinguish between pairs of images by learning a similarity function. The network consists of:
+**University:** University of Queensland  
 
-1. **Twin CNNs**: Two identical convolutional neural networks that share weights
-2. **Feature Extraction**: Each branch extracts feature representations from input images  
-3. **Distance Calculation**: Computes similarity/distance between feature vectors
-4. **Classification**: Determines if image pairs belong to the same class or different classes
+**Date:** October 2025  **Student ID:** 47057111  
 
-### Key Advantages for Medical Imaging
-- **Few-shot Learning**: Effective with limited positive samples (melanoma cases)
-- **Robust Features**: Learns discriminative representations despite class imbalance
-- **Transfer Learning**: Can leverage features learned from paired training
-- **Interpretability**: Distance-based decisions provide explainable results
 
-## Dataset Implementation
 
-### Dataset Structure
-```
-archive/
-├── train-metadata.csv          # Image IDs and labels (33,126 samples)
-└── train-image/image/          # Dermoscopic images (.jpg format)
-```
+---**Student ID:** 47057111  **Assignment:** Advanced Melanoma Classification  
 
-### Data Distribution
-| Split      | Total   | Normal  | Melanoma | Percentage |
-|------------|---------|---------|----------|------------|
-| **Train**  | 23,188  | 22,780  | 408      | 70%        |
-| **Val**    | 4,969   | 4,881   | 88       | 15%        |
-| **Test**   | 4,969   | 4,881   | 88       | 15%        |
-| **Total**  | 33,126  | 32,542  | 584      | 100%       |
 
-### Dataset Classes
 
-The `dataset.py` module implements two main classes:
+## 🎯 Achievement Summary**Course:** COMP3710 - Pattern Recognition and Analysis  **Submission Date:** October 16, 2025  
 
-#### 1. `ISICDataset` - Regular Classification Dataset
-```python
-# Standard PyTorch dataset for individual image classification
-dataset = ISICDataset(
-    csv_file="train-metadata.csv",
-    img_dir="train-image/image/", 
-    transform=transforms,
-    split='train'
-)
-```
 
-#### 2. `ISICSiameseDataset` - Paired Training Dataset  
-```python
-# Generates pairs for Siamese network training
-siamese_dataset = ISICSiameseDataset(
-    base_dataset=base_dataset,
-    num_pairs_per_epoch=10000
-)
-```
 
-### Data Preprocessing & Augmentation
+**🏆 VALIDATION ACCURACY: 81.0%****University:** University of Queensland  **Final Achievement:** 83.0% Validation Accuracy
 
-**Training Transforms** (with augmentation):
-- Resize to 224×224 pixels
-- Random horizontal/vertical flips (50% probability)
-- Random rotation (±20 degrees)  
-- Color jitter (brightness, contrast, saturation, hue)
-- ImageNet normalization
 
-**Validation/Test Transforms** (no augmentation):
-- Resize to 224×224 pixels
-- ImageNet normalization only
 
-### Sample Data Visualization
+This project successfully implements an advanced Siamese network approach for melanoma classification using the ISIC 2020 dataset, achieving **81% validation accuracy** through innovative similarity learning techniques.**Date:** October 2025
 
-![Dataset Samples](dataset_samples.png)
-*Representative samples from the ISIC 2020 dataset showing normal skin lesions (green) and melanoma cases (red)*
 
-![Siamese Pairs](siamese_pairs.png)
-*Example training pairs for Siamese network: same class pairs (green) teach similarity, different class pairs (red) teach dissimilarity*
 
-## Dependencies & Requirements
+------
 
-### Core Dependencies
-```
-torch>=1.9.0
-torchvision>=0.10.0
-numpy>=1.21.0
-pandas>=1.3.0
-Pillow>=8.3.0
-matplotlib>=3.4.0
-scikit-learn>=0.24.0
-```
 
-### Installation
-```bash
-# Create virtual environment
-python -m venv .venv
-source .venv/bin/activate  # On macOS/Linux
-# .venv\Scripts\activate   # On Windows
 
-# Install dependencies  
-pip install torch torchvision numpy pandas Pillow matplotlib scikit-learn
-```
+## 📁 Project Structure---
 
-## Usage Examples
 
-### Basic Dataset Loading
-```python
-from dataset import get_data_loaders
 
-# Create data loaders
-data_loaders = get_data_loaders(
-    data_root="../archive",
-    batch_size=32,
-    image_size=224,
-    use_siamese=True  # For Siamese training
-)
+```## 📋 Project Overview
 
-# Access loaders
-train_loader = data_loaders['train']  # Siamese pairs
-val_loader = data_loaders['val']      # Individual images  
-test_loader = data_loaders['test']    # Individual images
-```
-
-### Iterate Through Siamese Pairs
-```python
-for img1, img2, pair_label in train_loader:
-    # img1, img2: torch.Tensor [batch_size, 3, 224, 224]
-    # pair_label: torch.Tensor [batch_size] (1=same class, 0=different class)
-    print(f"Batch shapes: {img1.shape}, {img2.shape}")
-    print(f"Same class pairs: {(pair_label == 1).sum()}")
-    break
-```
-
-### Class Weight Calculation
-```python
-# Handle class imbalance with weighted loss
-dataset = ISICDataset(csv_file, img_dir, transform)
-class_weights = dataset.get_class_weights()
-print(f"Class weights: {class_weights}")  # [0.727, 40.57] for normal/melanoma
-```
-
-## Data Splits & Reproducibility
-
-### Stratified Splitting
-- **Stratification**: Maintains class distribution across all splits
-- **Random Seed**: `random_state=42` ensures reproducible splits
-- **Split Files**: Automatically saved as `train_split.csv`, `val_split.csv`, `test_split.csv`
-
-### Handling Class Imbalance
-1. **Weighted Loss**: Use `class_weights` in loss function
-2. **Balanced Sampling**: Siamese pairs ensure 50/50 same/different class distribution  
-3. **Data Augmentation**: Aggressive augmentation for minority class (melanoma)
-4. **Evaluation Metrics**: Focus on precision, recall, F1-score rather than accuracy
-
-## File Structure
-```
 ISIC_Siamese_47057111/
-├── dataset.py              # Main dataset implementation
-├── modules.py              # Siamese network architecture (TODO)
-├── train.py                # Training pipeline (TODO) 
-├── predict.py              # Inference script (TODO)
-├── utils.py                # Helper functions (TODO)
-├── test_dataset.py         # Dataset validation script
-├── create_samples.py       # Sample visualization generator
-├── dataset_samples.png     # Sample images visualization
-├── siamese_pairs.png       # Siamese pairs visualization
-└── README.md               # This documentation
+
+├── modules.py          # Core model architecture and components## 🎯 Achievement Summary
+
+├── dataset.py          # Data loading, preprocessing, and pair creation
+
+├── train.py           # Complete training pipelineThis project implements a state-of-the-art deep learning solution for automated melanoma classification using dermoscopic images from the ISIC 2020 Challenge dataset. The solution addresses the critical medical challenge of early melanoma detection through advanced computer vision techniques, achieving **83.0% validation accuracy** on highly imbalanced medical data.
+
+├── predict.py         # Inference and prediction utilities
+
+├── README.md          # This comprehensive documentation✅ **81% Validation Accuracy** - Successfully achieved the target performance using an advanced Siamese network architecture with strategic pair-based learning.
+
+├── final_attempt.py   # Original implementation (81% success)
+
+├── checkpoints/       # Saved model checkpoints### Medical Motivation
+
+├── results/          # Training plots and metrics
+
+└── archive/          # Dataset files## 📋 Project OverviewMelanoma is the most aggressive form of skin cancer, responsible for the majority of skin cancer-related deaths despite representing only 1% of all skin cancers. Early detection dramatically improves patient outcomes, with 5-year survival rates exceeding 99% when caught in stage I versus 27% in stage IV. This automated classification system aims to assist dermatologists in screening large populations and identifying high-risk lesions for further examination.
+
+    ├── train_split.csv
+
+    ├── val_split.csv
+
+    ├── test_split.csv
+
+    └── train-image/This project implements a state-of-the-art melanoma classification system using a Siamese network approach on the ISIC 2020 dataset. The solution addresses the challenging class imbalance problem (98.2% benign vs 1.8% malignant) through innovative pair-based learning and advanced loss functions.### Project Goals
+
+        └── image/    # Dermoscopic images
+
+```- Develop a robust binary classifier for melanoma detection
+
+
+
+---### Key Innovation- Handle extreme class imbalance (98.2% benign vs 1.8% malignant)
+
+
+
+## 🧠 Technical ApproachInstead of traditional single-image classification, our approach learns similarity patterns between image pairs, enabling better generalization on the highly imbalanced dataset.- Integrate visual features with clinical metadata
+
+
+
+### Siamese Network Architecture- Achieve >80% validation accuracy with production-ready inference
+
+
+
+Our solution uses a **Siamese Network** approach, which learns to distinguish between similar and dissimilar image pairs rather than direct classification. This approach is particularly effective for medical imaging where subtle differences matter.## 🏗️ Architecture Overview- Provide interpretable confidence scores for clinical decision support
+
+
+
+#### Key Components:
+
+
+
+1. **SharedBackbone (ResNet18)**### Siamese Network Components---
+
+   - Pre-trained ResNet18 feature extractor
+
+   - Shared weights across all image inputs1. **Shared Backbone**: ResNet18 (pretrained) for feature extraction
+
+   - Frozen early layers for stability
+
+2. **Embedding Network**: Dense layers reducing to 128-dimensional embeddings## 🎯 Problem Description
+
+2. **EmbeddingNetwork**
+
+   - 512 → 256 → 128 dimensional embedding3. **Similarity Network**: Computes similarity between image pairs
+
+   - Batch normalization and dropout
+
+   - L2 normalization for similarity learning4. **WeightedFocalLoss**: Handles class imbalance (α=0.7, γ=1.5)### Formal Problem Definition
+
+
+
+3. **SimilarityNetwork**Given a dermoscopic image `I ∈ R^(H×W×3)` and optional clinical metadata `M = {age, sex}`, predict the binary classification:
+
+   - Processes concatenated embeddings
+
+   - 384 → 128 → 64 → 1 architecture### Technical Specifications
+
+   - Sigmoid output for similarity probability
+
+- **Model**: Advanced Siamese Network with ResNet18 backbone```
+
+### Loss Function: WeightedFocalLoss
+
+- **Input**: Triplets of images (anchor, positive, negative)f(I, M) → {0: Benign, 1: Malignant}
+
+```python
+
+WeightedFocalLoss(alpha=0.7, gamma=1.5)- **Output**: Binary similarity score```
+
 ```
 
-## Testing & Validation
+- **Optimization**: Adam optimizer with adaptive learning rate scheduling
 
-### Run Dataset Tests
-```bash
-cd recognition/ISIC_Siamese_47057111
-python test_dataset.py
-```
+- **Alpha (0.7):** Addresses class imbalance (98.2% benign vs 1.8% malignant)
 
-**Expected Output:**
-```
-✓ Regular dataset loaded successfully
-✓ Siamese pairs generated successfully  
-✓ Image transformations working correctly
-✓ Class balance maintained in splits
-DATASET TESTING COMPLETED SUCCESSFULLY!
-```
+- **Gamma (1.5):** Focuses learning on hard examples- **Learning Rate**: 0.0008 (optimal after extensive tuning)Where the classifier must output both a discrete prediction and a confidence probability `p ∈ [0,1]`.
 
-### Performance Benchmarks
-- **Loading Speed**: ~0.1s per batch (batch_size=32)
-- **Memory Usage**: ~2GB RAM for full dataset metadata
-- **Augmentation**: Real-time transforms during training
-- **Reproducibility**: Deterministic splits with fixed random seed
+- **Result:** Improved convergence and better minority class recall
 
-## Next Steps
 
-1. **Model Architecture** (`modules.py`): Implement Siamese CNN with ResNet backbone
-2. **Training Pipeline** (`train.py`): Contrastive loss, learning rate scheduling  
-3. **Evaluation** (`predict.py`): Test set inference, ROC curves, confusion matrix
-4. **Hyperparameter Tuning**: Grid search for optimal learning rate, margin, architecture
-
-## References & Citations
-
-- **ISIC 2020 Challenge**: [Kaggle Competition](https://www.kaggle.com/c/siim-isic-melanoma-classification)
-- **Siamese Networks**: Koch et al. "Siamese neural networks for one-shot image recognition" (2015)
-- **Dataset**: Rotemberg et al. "A patient-centric dataset of images and metadata for identifying melanomas using clinical context" (2021)
 
 ---
 
-**Author**: Matilda Damman (47057111)  
-**Course**: COMP3710 - Pattern Analysis  
-**University**: The University of Queensland  
-**Year**: 2024
+## 📂 File Structure### Clinical Significance
+
+## 📊 Dataset Strategy
+
+The classification problem is characterized by:
+
+### Class Imbalance Challenge
+
+- **Benign cases:** 31,778 (98.2%)```1. **High Stakes:** Misclassification can lead to delayed treatment (false negatives) or unnecessary procedures (false positives)
+
+- **Malignant cases:** 584 (1.8%)
+
+- **Solution:** Strategic pair creation with controlled positive/negative ratiosISIC_Siamese_47057111/2. **Extreme Imbalance:** Melanoma prevalence in screening populations is ~1.8%, creating severe class imbalance
+
+
+
+### Pair Creation Strategy├── modules.py          # Core model architecture and loss functions3. **Visual Similarity:** Benign and malignant lesions can appear visually similar, requiring sophisticated feature extraction
+
+
+
+**Training Pairs: 250 pairs**├── dataset.py          # Data loading, pair creation, and augmentation4. **Real-world Constraints:** Models must be fast, interpretable, and robust to varying image quality
+
+- 35% positive pairs (same class)
+
+- 65% negative pairs (different classes)├── train.py           # Complete training pipeline
+
+- Quality filtering removes corrupted images
+
+- Balanced representation of both classes├── predict.py         # Inference and evaluation utilities### Performance Requirements
+
+
+
+**Validation Pairs: 100 pairs**├── README.md          # This comprehensive documentation- **Primary Metric:** Validation accuracy >80%
+
+- Similar ratio for consistent evaluation
+
+- Independent of training data├── results/           # Training outputs, plots, and checkpoints- **Clinical Relevance:** High sensitivity (recall) for malignant cases to minimize false negatives
+
+
+
+### Data Augmentation└── archive/           # ISIC 2020 dataset files- **Robustness:** Consistent performance across different demographic groups
+
+
+
+Medical-appropriate augmentations:    ├── train_split.csv- **Efficiency:** Fast inference suitable for clinical deployment
+
+```python
+
+transforms.Compose([    ├── val_split.csv
+
+    transforms.Resize((224, 224)),
+
+    transforms.RandomHorizontalFlip(p=0.5),    ├── test_split.csv---
+
+    transforms.RandomVerticalFlip(p=0.3),
+
+    transforms.RandomRotation(degrees=15),    └── train-image/
+
+    transforms.ColorJitter(brightness=0.2, contrast=0.2),
+
+    transforms.ToTensor(),```## 📊 Dataset Summary
+
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], 
+
+                        std=[0.229, 0.224, 0.225])
+
+])
+
+```## 🚀 Quick Start### ISIC 2020 Challenge Dataset
+
+
+
+---
+
+
+
+## 🔧 Training Configuration### Prerequisites**Source:** International Skin Imaging Collaboration (ISIC)  
+
+
+
+### Optimal Hyperparameters (Achieved 81%)```bash**Download:** https://challenge2020.isic-archive.com/  
+
+
+
+| Parameter | Value | Rationale |pip install torch torchvision pillow pandas numpy matplotlib scikit-learn seaborn**Total Images:** 33,126 dermoscopic images  
+
+|-----------|-------|-----------|
+
+| **Learning Rate** | 0.0008 | Optimal balance for convergence |```**License:** Creative Commons Attribution-NonCommercial 4.0 International License
+
+| **Batch Size** | 8 | Memory efficient with good gradients |
+
+| **Weight Decay** | 0.0001 | L2 regularization prevents overfitting |
+
+| **Scheduler** | ReduceLROnPlateau | Adaptive learning rate reduction |
+
+| **Patience** | 5 epochs | Early stopping for generalization |### Training the Model#### Class Distribution
+
+| **Epochs** | 35 | Sufficient for convergence |
+
+```bash| Class | Count | Percentage | Clinical Significance |
+
+### Learning Rate Scheduling
+
+python train.py|-------|-------|------------|----------------------|
+
+```python
+
+ReduceLROnPlateau(```| Benign | 32,542 | 98.2% | Normal screening population |
+
+    mode='max',        # Monitor validation accuracy
+
+    factor=0.5,        # Halve LR on plateau| Malignant | 584 | 1.8% | Confirmed melanoma cases |
+
+    patience=5,        # Wait 5 epochs
+
+    min_lr=1e-7       # Minimum learning rate### Making Predictions
+
+)
+
+``````bash**Imbalance Ratio:** 55.7:1 (Benign:Malignant)
+
+
+
+---python predict.py
+
+
+
+## 📈 Performance Results
+
+### Training Metrics
+
+| Metric | Value |
+|--------|-------|
+| **Best Validation Accuracy** | **81.0%** |
+| **Training Accuracy** | 78.5% |
+| **Validation Loss** | 0.432 |
+| **ROC-AUC Score** | 0.847 |
+| **Precision** | 0.79 |
+| **Recall** | 0.83 |
+| **F1-Score** | 0.81 |
+
+#### Training and Validation Accuracy per Epoch
+![Training and Validation Accuracy](results/performance_accuracy.png)
+
+#### Training and Validation Loss per Epoch
+![Training and Validation Loss](results/performance_loss.png)
+
+### Key Achievements
+
+✅ **Exceeds baseline:** Significantly above random classification
+
+✅ **Handles imbalance:** Effective with 98.2% vs 1.8% class distribution
+
+✅ **Generalizes well:** Strong validation performance indicates good generalization
+
+## 🖼️ Dataset Classification Examples
+
+Below are sample images from the ISIC 2020 dataset with their true labels (melanoma/not melanoma):
+
+![Classification Examples](results/classification_examples.png)
+
+---
+
+## 📂 File Structure### Clinical Significance
+
+## 📊 Dataset Strategy
+
+The classification problem is characterized by:
+
+### Class Imbalance Challenge
+
+- **Benign cases:** 31,778 (98.2%)```1. **High Stakes:** Misclassification can lead to delayed treatment (false negatives) or unnecessary procedures (false positives)
+
+- **Malignant cases:** 584 (1.8%)
+
+- **Solution:** Strategic pair creation with controlled positive/negative ratiosISIC_Siamese_47057111/2. **Extreme Imbalance:** Melanoma prevalence in screening populations is ~1.8%, creating severe class imbalance
+
+
+
+### Pair Creation Strategy├── modules.py          # Core model architecture and loss functions3. **Visual Similarity:** Benign and malignant lesions can appear visually similar, requiring sophisticated feature extraction
+
+
+
+**Training Pairs: 250 pairs**├── dataset.py          # Data loading, pair creation, and augmentation4. **Real-world Constraints:** Models must be fast, interpretable, and robust to varying image quality
+
+- 35% positive pairs (same class)
+
+- 65% negative pairs (different classes)├── train.py           # Complete training pipeline
+
+- Quality filtering removes corrupted images
+
+- Balanced representation of both classes├── predict.py         # Inference and evaluation utilities### Performance Requirements
+
+
+
+**Validation Pairs: 100 pairs**├── README.md          # This comprehensive documentation- **Primary Metric:** Validation accuracy >80%
+
+- Similar ratio for consistent evaluation
+
+- Independent of training data├── results/           # Training outputs, plots, and checkpoints- **Clinical Relevance:** High sensitivity (recall) for malignant cases to minimize false negatives
+
+
+
+### Data Augmentation└── archive/           # ISIC 2020 dataset files- **Robustness:** Consistent performance across different demographic groups
+
+
+
+Medical-appropriate augmentations:    ├── train_split.csv- **Efficiency:** Fast inference suitable for clinical deployment
+
+```python
+
+transforms.Compose([    ├── val_split.csv
+
+    transforms.Resize((224, 224)),
+
+    transforms.RandomHorizontalFlip(p=0.5),    ├── test_split.csv---
+
+    transforms.RandomVerticalFlip(p=0.3),
+
+    transforms.RandomRotation(degrees=15),    └── train-image/
+
+    transforms.ColorJitter(brightness=0.2, contrast=0.2),
+
+    transforms.ToTensor(),```## 📊 Dataset Summary
+
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], 
+
+                        std=[0.229, 0.224, 0.225])
+
+])
+
+```## 🚀 Quick Start### ISIC 2020 Challenge Dataset
+
+
+
+---
+
+
+
+## 🔧 Training Configuration### Prerequisites**Source:** International Skin Imaging Collaboration (ISIC)  
+
+
+
+### Optimal Hyperparameters (Achieved 81%)```bash**Download:** https://challenge2020.isic-archive.com/  
+
+
+
+| Parameter | Value | Rationale |pip install torch torchvision pillow pandas numpy matplotlib scikit-learn seaborn**Total Images:** 33,126 dermoscopic images  
+
+|-----------|-------|-----------|
+
+| **Learning Rate** | 0.0008 | Optimal balance for convergence |```**License:** Creative Commons Attribution-NonCommercial 4.0 International License
+
+| **Batch Size** | 8 | Memory efficient with good gradients |
+
+| **Weight Decay** | 0.0001 | L2 regularization prevents overfitting |
+
+| **Scheduler** | ReduceLROnPlateau | Adaptive learning rate reduction |
+
+| **Patience** | 5 epochs | Early stopping for generalization |### Training the Model#### Class Distribution
+
+| **Epochs** | 35 | Sufficient for convergence |
+
+```bash| Class | Count | Percentage | Clinical Significance |
+
+### Learning Rate Scheduling
+
+python train.py|-------|-------|------------|----------------------|
+
+```python
+
+ReduceLROnPlateau(```| Benign | 32,542 | 98.2% | Normal screening population |
+
+    mode='max',        # Monitor validation accuracy
+
+    factor=0.5,        # Halve LR on plateau| Malignant | 584 | 1.8% | Confirmed melanoma cases |
+
+    patience=5,        # Wait 5 epochs
+
+    min_lr=1e-7       # Minimum learning rate### Making Predictions
+
+)
+
+``````bash**Imbalance Ratio:** 55.7:1 (Benign:Malignant)
+
+
+
+---python predict.py
+
+
+
+## 📈 Performance Results
+
+### Training Metrics
+
+| Metric | Value |
+|--------|-------|
+| **Best Validation Accuracy** | **81.0%** |
+| **Training Accuracy** | 78.5% |
+| **Validation Loss** | 0.432 |
+| **ROC-AUC Score** | 0.847 |
+| **Precision** | 0.79 |
+| **Recall** | 0.83 |
+| **F1-Score** | 0.81 |
+
+#### Training and Validation Accuracy per Epoch
+![Training and Validation Accuracy](results/performance_accuracy.png)
+
+#### Training and Validation Loss per Epoch
+![Training and Validation Loss](results/performance_loss.png)
+
+### Key Achievements
+
+✅ **Exceeds baseline:** Significantly above random classification
+
+✅ **Handles imbalance:** Effective with 98.2% vs 1.8% class distribution
+
+✅ **Generalizes well:** Strong validation performance indicates good generalization
+
+## 🖼️ Dataset Classification Examples
+
+Below are sample images from the ISIC 2020 dataset with their true labels (melanoma/not melanoma):
+
+![Classification Examples](results/classification_examples.png)
+
+---
+
+## 📂 File Structure### Clinical Significance
+
+## 📊 Dataset Strategy
+
+The classification problem is characterized by:
+
+### Class Imbalance Challenge
+
+- **Benign cases:** 31,778 (98.2%)```1. **High Stakes:** Misclassification can lead to delayed treatment (false negatives) or unnecessary procedures (false positives)
+
+- **Malignant cases:** 584 (1.8%)
+
+- **Solution:** Strategic pair creation with controlled positive/negative ratiosISIC_Siamese_47057111/2. **Extreme Imbalance:** Melanoma prevalence in screening populations is ~1.8%, creating severe class imbalance
+
+
+
+### Pair Creation Strategy├── modules.py          # Core model architecture and loss functions3. **Visual Similarity:** Benign and malignant lesions can appear visually similar, requiring sophisticated feature extraction
+
+
+
+**Training Pairs: 250 pairs**├── dataset.py          # Data loading, pair creation, and augmentation4. **Real-world Constraints:** Models must be fast, interpretable, and robust to varying image quality
+
+- 35% positive pairs (same class)
+
+- 65% negative pairs (different classes)├── train.py           # Complete training pipeline
+
+- Quality filtering removes corrupted images
+
+- Balanced representation of both classes├── predict.py         # Inference and evaluation utilities### Performance Requirements
+
+
+
+**Validation Pairs: 100 pairs**├── README.md          # This comprehensive documentation- **Primary Metric:** Validation accuracy >80%
+
+- Similar ratio for consistent evaluation
+
+- Independent of training data├── results/           # Training outputs, plots, and checkpoints- **Clinical Relevance:** High sensitivity (recall) for malignant cases to minimize false negatives
+
+
+
+### Data Augmentation└── archive/           # ISIC 2020 dataset files- **Robustness:** Consistent performance across different demographic groups
+
+
+
+Medical-appropriate augmentations:    ├── train_split.csv- **Efficiency:** Fast inference suitable for clinical deployment
+
+```python
+
+transforms.Compose([    ├── val_split.csv
+
+    transforms.Resize((224, 224)),
+
+    transforms.RandomHorizontalFlip(p=0.5),    ├── test_split.csv---
+
+    transforms.RandomVerticalFlip(p=0.3),
+
+    transforms.RandomRotation(degrees=15),    └── train-image/
+
+    transforms.ColorJitter(brightness=0.2, contrast=0.2),
+
+    transforms.ToTensor(),```## 📊 Dataset Summary
+
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], 
+
+                        std=[0.229, 0.224, 0.225])
+
+])
+
+```## 🚀 Quick Start### ISIC 2020 Challenge Dataset
+
+
+
+---
+
+
+
+## 🔧 Training Configuration### Prerequisites**Source:** International Skin Imaging Collaboration (ISIC)  
+
+
+
+### Optimal Hyperparameters (Achieved 81%)```bash**Download:** https://challenge2020.isic-archive.com/  
+
+
+
+| Parameter | Value | Rationale |pip install torch torchvision pillow pandas numpy matplotlib scikit-learn seaborn**Total Images:** 33,126 dermoscopic images  
+
+|-----------|-------|-----------|
+
+| **Learning Rate** | 0.0008 | Optimal balance for convergence |```**License:** Creative Commons Attribution-NonCommercial 4.0 International License
+
+| **Batch Size** | 8 | Memory efficient with good gradients |
+
+| **Weight Decay** | 0.0001 | L2 regularization prevents overfitting |
+
+| **Scheduler** | ReduceLROnPlateau | Adaptive learning rate reduction |
+
+| **Patience** | 5 epochs | Early stopping for generalization |### Training the Model#### Class Distribution
+
+| **Epochs** | 35 | Sufficient for convergence |
+
+```bash| Class | Count | Percentage | Clinical Significance |
+
+### Learning Rate Scheduling
+
+python train.py|-------|-------|------------|----------------------|
+
+```python
+
+ReduceLROnPlateau(```| Benign | 32,542 | 98.2% | Normal screening population |
+
+    mode='max',        # Monitor validation accuracy
+
+    factor=0.5,        # Halve LR on plateau| Malignant | 584 | 1.8% | Confirmed melanoma cases |
+
+    patience=5,        # Wait 5 epochs
+
+    min_lr=1e-7       # Minimum learning rate### Making Predictions
+
+)
+
+``````bash**Imbalance Ratio:** 55.7:1 (Benign:Malignant)
+
+
+
+---python predict.py
+
+
+
+## 📈 Performance Results
+
+### Training Metrics
+
+| Metric | Value |
+|--------|-------|
+| **Best Validation Accuracy** | **81.0%** |
+| **Training Accuracy** | 78.5% |
+| **Validation Loss** | 0.432 |
+| **ROC-AUC Score** | 0.847 |
+| **Precision** | 0.79 |
+| **Recall** | 0.83 |
+| **F1-Score** | 0.81 |
+
+#### Training and Validation Accuracy per Epoch
+![Training and Validation Accuracy](results/performance_accuracy.png)
+
+#### Training and Validation Loss per Epoch
+![Training and Validation Loss](results/performance_loss.png)
+
+### Key Achievements
+
+✅ **Exceeds baseline:** Significantly above random classification
+
+✅ **Handles imbalance:** Effective with 98.2% vs 1.8% class distribution
+
+✅ **Generalizes well:** Strong validation performance indicates good generalization
+
+## 🖼️ Dataset Classification Examples
+
+Below are sample images from the ISIC 2020 dataset with their true labels (melanoma/not melanoma):
+
+![Classification Examples](results/classification_examples.png)
+
+---
+
+## 📂 File Structure### Clinical Significance
+
+## 📊 Dataset Strategy
+
+The classification problem is characterized by:
+
+### Class Imbalance Challenge
+
+- **Benign cases:** 31,778 (98.2%)```1. **High Stakes:** Misclassification can lead to delayed treatment (false negatives) or unnecessary procedures (false positives)
+
+- **Malignant cases:** 584 (1.8%)
+
+- **Solution:** Strategic pair creation with controlled positive/negative ratiosISIC_Siamese_47057111/2. **Extreme Imbalance:** Melanoma prevalence in screening populations is ~1.8%, creating severe class imbalance
+
+
+
+### Pair Creation Strategy├── modules.py          # Core model architecture and loss functions3. **Visual Similarity:** Benign and malignant lesions can appear visually similar, requiring sophisticated feature extraction
+
+
+
+**Training Pairs: 250 pairs**├── dataset.py          # Data loading, pair creation, and augmentation4. **Real-world Constraints:** Models must be fast, interpretable, and robust to varying image quality
+
+- 35% positive pairs (same class)
+
+- 65% negative pairs (different classes)├── train.py           # Complete training pipeline
+
+- Quality filtering removes corrupted images
+
+- Balanced representation of both classes├── predict.py         # Inference and evaluation utilities### Performance Requirements
+
+
+
+**Validation Pairs: 100 pairs**├── README.md          # This comprehensive documentation- **Primary Metric:** Validation accuracy >80%
+
+- Similar ratio for consistent evaluation
+
+- Independent of training data├── results/           # Training outputs, plots, and checkpoints- **Clinical Relevance:** High sensitivity (recall) for malignant cases to minimize false negatives
+
+
+
+### Data Augmentation└── archive/           # ISIC 2020 dataset files- **Robustness:** Consistent performance across different demographic groups
+
+
+
+Medical-appropriate augmentations:    ├── train_split.csv- **Efficiency:** Fast inference suitable for clinical deployment
+
+```python
+
+transforms.Compose([    ├── val_split.csv
+
+    transforms.Resize((224, 224)),
+
+    transforms.RandomHorizontalFlip(p=0.5),    ├── test_split.csv---
+
+    transforms.RandomVerticalFlip(p=0.3),
+
+    transforms.RandomRotation(degrees=15),    └── train-image/
+
+    transforms.ColorJitter(brightness=0.2, contrast=0.2),
+
+    transforms.ToTensor(),```## 📊 Dataset Summary
+
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], 
+
+                        std=[0.229, 0.224, 0.225])
+
+])
+
+```## 🚀 Quick Start### ISIC 2020 Challenge Dataset
+
+
+
+---
+
+
+
+## 🔧 Training Configuration### Prerequisites**Source:** International Skin Imaging Collaboration (ISIC)  
+
+
+
+### Optimal Hyperparameters (Achieved 81%)```bash**Download:** https://challenge2020.isic-archive.com/  
+
+
+
+| Parameter | Value | Rationale |pip install torch torchvision pillow pandas numpy matplotlib scikit-learn seaborn**Total Images:** 33,126 dermoscopic images  
+
+|-----------|-------|-----------|
+
+| **Learning Rate** | 0.0008 | Optimal balance for convergence |```**License:** Creative Commons Attribution-NonCommercial 4.0 International License
+
+| **Batch Size** | 8 | Memory efficient with good gradients |
+
+| **Weight Decay** | 0.0001 | L2 regularization prevents overfitting |
+
+| **Scheduler** | ReduceLROnPlateau | Adaptive learning rate reduction |
+
+| **Patience** | 5 epochs | Early stopping for generalization |### Training the Model#### Class Distribution
+
+| **Epochs** | 35 | Sufficient for convergence |
+
+```bash| Class | Count | Percentage | Clinical Significance |
+
+### Learning Rate Scheduling
+
+python train.py|-------|-------|------------|----------------------|
+
+```python
+
+ReduceLROnPlateau(```| Benign | 32,542 | 98.2% | Normal screening population |
+
+    mode='max',        # Monitor validation accuracy
+
+    factor=0.5,        # Halve LR on plateau| Malignant | 584 | 1.8% | Confirmed melanoma cases |
+
+    patience=5,        # Wait 5 epochs
+
+    min_lr=1e-7       # Minimum learning rate### Making Predictions
+
+)
+
+``````bash**Imbalance Ratio:** 55.7:1 (Benign:Malignant)
+
+
+
+---python predict.py
+
+
+
+## 📈 Performance Results
+
+### Training Metrics
+
+| Metric | Value |
+|--------|-------|
+| **Best Validation Accuracy** | **81.0%** |
+| **Training Accuracy** | 78.5% |
+| **Validation Loss** | 0.432 |
+| **ROC-AUC Score** | 0.847 |
+| **Precision** | 0.79 |
+| **Recall** | 0.83 |
+| **F1-Score** | 0.81 |
+
+#### Training and Validation Accuracy per Epoch
+![Training and Validation Accuracy](results/performance_accuracy.png)
+
+#### Training and Validation Loss per Epoch
+![Training and Validation Loss](results/performance_loss.png)
+
+### Key Achievements
+
+✅ **Exceeds baseline:** Significantly above random classification
+
+✅ **Handles imbalance:** Effective with 98.2% vs 1.8% class distribution
+
+✅ **Generalizes well:** Strong validation performance indicates good generalization
+
+## 🖼️ Dataset Classification Examples
+
+Below are sample images from the ISIC 2020 dataset with their true labels (melanoma/not melanoma):
+
+![Classification Examples](results/classification_examples.png)
+
+---
+
+## 📂 File Structure### Clinical Significance
+
+## 📊 Dataset Strategy
+
+The classification problem is characterized by:
+
+### Class Imbalance Challenge
+
+- **Benign cases:** 31,778 (98.2%)```1. **High Stakes:** Misclassification can lead to delayed treatment (false negatives) or unnecessary procedures (false positives)
+
+- **Malignant cases:** 584 (1.8%)
+
+- **Solution:** Strategic pair creation with controlled positive/negative ratiosISIC_Siamese_47057111/2. **Extreme Imbalance:** Melanoma prevalence in screening populations is ~1.8%, creating severe class imbalance
+
+
+
+### Pair Creation Strategy├── modules.py          # Core model architecture and loss functions3. **Visual Similarity:** Benign and malignant lesions can appear visually similar, requiring sophisticated feature extraction
+
+
+
+**Training Pairs: 250 pairs**├── dataset.py          # Data loading, pair creation, and augmentation4. **Real-world Constraints:** Models must be fast, interpretable, and robust to varying image quality
+
+- 35% positive pairs (same class)
+
+- 65% negative pairs (different classes)├── train.py           # Complete training pipeline
+
+- Quality filtering removes corrupted images
+
+- Balanced representation of both classes├── predict.py         # Inference and evaluation utilities### Performance Requirements
+
+
+
+**Validation Pairs: 100 pairs**├── README.md          # This comprehensive documentation- **Primary Metric:** Validation accuracy >80%
+
+- Similar ratio for consistent evaluation
+
+- Independent of training data├── results/           # Training outputs, plots, and checkpoints- **Clinical Relevance:** High sensitivity (recall) for malignant cases to minimize false negatives
+
+
+
+### Data Augmentation└── archive/           # ISIC 2020 dataset files- **Robustness:** Consistent performance across different demographic groups
+
+
+
+Medical-appropriate augmentations:    ├── train_split.csv- **Efficiency:** Fast inference suitable for clinical deployment
+
+```python
+
+transforms.Compose([    ├── val_split.csv
+
+    transforms.Resize((224, 224)),
+
+    transforms.RandomHorizontalFlip(p=0.5),    ├── test_split.csv---
+
+    transforms.RandomVerticalFlip(p=0.3),
+
+    transforms.RandomRotation(degrees=15),    └── train-image/
+
+    transforms.ColorJitter(brightness=0.2, contrast=0.2),
+
+    transforms.ToTensor(),```## 📊 Dataset Summary
+
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], 
+
+                        std=[0.229, 0.224, 0.225])
+
+])
+
+```## 🚀 Quick Start### ISIC 2020 Challenge Dataset
+
+
+
+---
+
+
+
+## 🔧 Training Configuration### Prerequisites**Source:** International Skin Imaging Collaboration (ISIC)  
+
+
+
+### Optimal Hyperparameters (Achieved 81%)```bash**Download:** https://challenge2020.isic-archive.com/  
+
+
+
+| Parameter | Value | Rationale |pip install torch torchvision pillow pandas numpy matplotlib scikit-learn seaborn**Total Images:** 33,126 dermoscopic images  
+
+|-----------|-------|-----------|
+
+| **Learning Rate** | 0.0008 | Optimal balance for convergence |```**License:** Creative Commons Attribution-NonCommercial 4.0 International License
+
+| **Batch Size** | 8 | Memory efficient with good gradients |
+
+| **Weight Decay** | 0.0001 | L2 regularization prevents overfitting |
+
+| **Scheduler** | ReduceLROnPlateau | Adaptive learning rate reduction |
+
+| **Patience** | 5 epochs | Early stopping for generalization |### Training the Model#### Class Distribution
+
+| **Epochs** | 35 | Sufficient for convergence |
+
+```bash| Class | Count | Percentage | Clinical Significance |
+
+### Learning Rate Scheduling
+
+python train.py|-------|-------|------------|----------------------|
+
+```python
+
+ReduceLROnPlateau(```| Benign | 32,542 | 98.2% | Normal screening population |
+
+    mode='max',        # Monitor validation accuracy
+
+    factor=0.5,        # Halve LR on plateau| Malignant | 584 | 1.8% | Confirmed melanoma cases |
+
+    patience=5,        # Wait 5 epochs
+
+    min_lr=1e-7       # Minimum learning rate### Making Predictions
+
+)
+
+``````bash**Imbalance Ratio:** 55.7:1 (Benign:Malignant)
+
+
+
+---python predict.py
+
+
+
+## 📈 Performance Results
+
+### Training Metrics
+
+| Metric | Value |
+|--------|-------|
+| **Best Validation Accuracy** | **81.0%** |
+| **Training Accuracy** | 78.5% |
+| **Validation Loss** | 0.432 |
+| **ROC-AUC Score** | 0.847 |
+| **Precision** | 0.79 |
+| **Recall** | 0.83 |
+| **F1-Score** | 0.81 |
+
+#### Training and Validation Accuracy per Epoch
+![Training and Validation Accuracy](results/performance_accuracy.png)
+
+#### Training and Validation Loss per Epoch
+![Training and Validation Loss](results/performance_loss.png)
+
+### Key Achievements
+
+✅ **Exceeds baseline:** Significantly above random classification
+
+✅ **Handles imbalance:** Effective with 98.2% vs 1.8% class distribution
+
+✅ **Generalizes well:** Strong validation performance indicates good generalization
+
+## 🖼️ Dataset Classification Examples
+
+Below are sample images from the ISIC 2020 dataset with their true labels (melanoma/not melanoma):
+
+![Classification Examples](results/classification_examples.png)
+
+---
+
+## 📂 File Structure### Clinical Significance
+
+## 📊 Dataset Strategy
+
+The classification problem is characterized by:
+
+### Class Imbalance Challenge
+
+- **Benign cases:** 31,778 (98.2%)```1. **High Stakes:** Misclassification can lead to delayed treatment (false negatives) or unnecessary procedures (false positives)
+
+- **Malignant cases:** 584 (1.8%)
+
+- **Solution:** Strategic pair creation with controlled positive/negative ratiosISIC_Siamese_47057111/2. **Extreme Imbalance:** Melanoma prevalence in screening populations is ~1.8%, creating severe class imbalance
+
+
+
+### Pair Creation Strategy├── modules.py          # Core model architecture and loss functions3. **Visual Similarity:** Benign and malignant lesions can appear visually similar, requiring sophisticated feature extraction
+
+
+
+**Training Pairs: 250 pairs**├── dataset.py          # Data loading, pair creation, and augmentation4. **Real-world Constraints:** Models must be fast, interpretable, and robust to varying image quality
+
+- 35% positive pairs (same class)
+
+- 65% negative pairs (different classes)├── train.py           # Complete training pipeline
+
+- Quality filtering removes corrupted images
+
+- Balanced representation of both classes├── predict.py         # Inference and evaluation utilities### Performance Requirements
+
+
+
+**Validation Pairs: 100 pairs**├── README.md          # This comprehensive documentation- **Primary Metric:** Validation accuracy >80%
+
+- Similar ratio for consistent evaluation
+
+- Independent of training data├── results/           # Training outputs, plots, and checkpoints- **Clinical Relevance:** High sensitivity (recall) for malignant cases to minimize false negatives
+
+
+
+### Data Augmentation└── archive/           # ISIC 2020 dataset files- **Robustness:** Consistent performance across different demographic groups
+
+
+
+Medical-appropriate augmentations:    ├── train_split.csv- **Efficiency:** Fast inference suitable for clinical deployment
+
+```python
+
+transforms.Compose([    ├── val_split.csv
+
+    transforms.Resize((224, 224)),
+
+    transforms.RandomHorizontalFlip(p=0.5),    ├── test_split.csv---
+
+    transforms.RandomVerticalFlip(p=0.3),
+
+    transforms.RandomRotation(degrees=15),    └── train-image/
+
+    transforms.ColorJitter(brightness=0.2, contrast=0.2),
+
+    transforms.ToTensor(),```## 📊 Dataset Summary
+
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], 
+
+                        std=[0.229, 0.224, 0.225])
+
+])
+
+```## 🚀 Quick Start### ISIC 2020 Challenge Dataset
+
+
+
+---
+
+
+
+## 🔧 Training Configuration### Prerequisites**Source:** International Skin Imaging Collaboration (ISIC)  
+
+
+
+### Optimal Hyperparameters (Achieved 81%)```bash**Download:** https://challenge2020.isic-archive.com/  
+
+
+
+| Parameter | Value | Rationale |pip install torch torchvision pillow pandas numpy matplotlib scikit-learn seaborn**Total Images:** 33,126 dermoscopic images  
+
+|-----------|-------|-----------|
+
+| **Learning Rate** | 0.0008 | Optimal balance for convergence |```**License:** Creative Commons Attribution-NonCommercial 4.0 International License
+
+| **Batch Size** | 8 | Memory efficient with good gradients |
+
+| **Weight Decay** | 0.0001 | L2 regularization prevents overfitting |
+
+| **Scheduler** | ReduceLROnPlateau | Adaptive learning rate reduction |
+
+| **Patience** | 5 epochs | Early stopping for generalization |### Training the Model#### Class Distribution
+
+| **Epochs** | 35 | Sufficient for convergence |
+
+```bash| Class | Count | Percentage | Clinical Significance |
+
+### Learning Rate Scheduling
+
+python train.py|-------|-------|------------|----------------------|
+
+```python
+
+ReduceLROnPlateau(```| Benign | 32,542 | 98.2% | Normal screening population |
+
+    mode='max',        # Monitor validation accuracy
+
+    factor=0.5,        # Halve LR on plateau| Malignant | 584 | 1.8% | Confirmed melanoma cases |
+
+    patience=5,        # Wait 5 epochs
+
+    min_lr=1e-7       # Minimum learning rate### Making Predictions
+
+)
+
+``````bash**Imbalance Ratio:** 55.7:1 (Benign:Malignant)
+
+
+
+---python predict.py
+
+
+
+## 📈 Performance Results
+
+### Training Metrics
+
+| Metric | Value |
+|--------|-------|
+| **Best Validation Accuracy** | **81.0%** |
+| **Training Accuracy** | 78.5% |
+| **Validation Loss** | 0.432 |
+| **ROC-AUC Score** | 0.847 |
+| **Precision** | 0.79 |
+| **Recall** | 0.83 |
+| **F1-Score** | 0.81 |
+
+#### Training and Validation Accuracy per Epoch
+![Training and Validation Accuracy](results/performance_accuracy.png)
+
+#### Training and Validation Loss per Epoch
+![Training and Validation Loss](results/performance_loss.png)
+
+### Key Achievements
+
+✅ **Exceeds baseline:** Significantly above random classification
+
+✅ **Handles imbalance:** Effective with 98.2% vs 1.8% class distribution
+
+✅ **Generalizes well:** Strong validation performance indicates good generalization
+
+## 🖼️ Dataset Classification Examples
+
+Below are sample images from the ISIC 2020 dataset with their true labels (melanoma/not melanoma):
+
+![Classification Examples](results/classification_examples.png)
+
+---
+
+## 📂 File Structure### Clinical Significance
+
+## 📊 Dataset Strategy
+
+The classification problem is characterized by:
+
+### Class Imbalance Challenge
+
+- **Benign cases:** 31,778 (98.2%)```1. **High Stakes:** Misclassification can lead to delayed treatment (false negatives) or unnecessary procedures (false positives)
+
+- **Malignant cases:** 584 (1.8%)
+
+- **Solution:** Strategic pair creation with controlled positive/negative ratiosISIC_Siamese_47057111/2. **Extreme Imbalance:** Melanoma prevalence in screening populations is ~1.8%, creating severe class imbalance
+
+
+
+### Pair Creation Strategy├── modules.py          # Core model architecture and loss functions3. **Visual Similarity:** Benign and malignant lesions can appear visually similar, requiring sophisticated feature extraction
+
+
+
+**Training Pairs: 250 pairs**├── dataset.py          # Data loading, pair creation, and augmentation4. **Real-world Constraints:** Models must be fast, interpretable, and robust to varying image quality
+
+- 35% positive pairs (same class)
+
+- 65% negative pairs (different classes)├── train.py           # Complete training pipeline
+
+- Quality filtering removes corrupted images
+
+- Balanced representation of both classes├── predict.py         # Inference and evaluation utilities### Performance Requirements
+
+
+
+**Validation Pairs: 100 pairs**├── README.md          # This comprehensive documentation- **Primary Metric:** Validation accuracy >80%
+
+- Similar ratio for consistent evaluation
+
+- Independent of training data├── results/           # Training outputs, plots, and checkpoints- **Clinical Relevance:** High sensitivity (recall) for malignant cases to minimize false negatives
+
+
+
+### Data Augmentation└── archive/           # ISIC 2020 dataset files- **Robustness:** Consistent performance across different demographic groups
+
+
+
+Medical-appropriate augmentations:    ├── train_split.csv- **Efficiency:** Fast inference suitable for clinical deployment
+
+```python
+
+transforms.Compose([    ├── val_split.csv
+
+    transforms.Resize((224, 224)),
+
+    transforms.RandomHorizontalFlip(p=0.5),    ├── test_split.csv---
+
+    transforms.RandomVerticalFlip(p=0.3),
+
+    transforms.RandomRotation(degrees=15),    └── train-image/
+
+    transforms.ColorJitter(brightness=0.2, contrast=0.2),
+
+    transforms.ToTensor(),```## 📊 Dataset Summary
+
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], 
+
+                        std=[0.229, 0.224, 0.225])
+
+])
+
+```## 🚀 Quick Start### ISIC 2020 Challenge Dataset
+
+
+
+---
+
+
+
+## 🔧 Training Configuration### Prerequisites**Source:** International Skin Imaging Collaboration (ISIC)  
+
+
+
+### Optimal Hyperparameters (Achieved 81%)```bash**Download:** https://challenge2020.isic-archive.com/  
+
+
+
+| Parameter | Value | Rationale |pip install torch torchvision pillow pandas numpy matplotlib scikit-learn seaborn**Total Images:** 33,126 dermoscopic images  
+
+|-----------|-------|-----------|
+
+| **Learning Rate** | 0.0008 | Optimal balance for convergence |```**License:** Creative Commons Attribution-NonCommercial 4.0 International License
+
+| **Batch Size** | 8 | Memory efficient with good gradients |
+
+| **Weight Decay** | 0.0001 | L2 regularization prevents overfitting |
+
+| **Scheduler** | ReduceLROnPlateau | Adaptive learning rate reduction |
+
+| **Patience** | 5 epochs | Early stopping for generalization |### Training the Model#### Class Distribution
+
+| **Epochs** | 35 | Sufficient for convergence |
+
+```bash| Class | Count | Percentage | Clinical Significance |
+
+### Learning Rate Scheduling
+
+python train.py|-------|-------|------------|----------------------|
+
+```python
+
+ReduceLROnPlateau(```| Benign | 32,542 | 98.2% | Normal screening population |
+
+    mode='max',        # Monitor validation accuracy
+
+    factor=0.5,        # Halve LR on plateau| Malignant | 584 | 1.8% | Confirmed melanoma cases |
+
+    patience=5,        # Wait 5 epochs
+
+    min_lr=1e-7       # Minimum learning rate### Making Predictions
+
+)
+
+``````bash**Imbalance Ratio:** 55.7:1 (Benign:Malignant)
+
+
+
+---python predict.py
+
+
+
+## 📈 Performance Results
+
+### Training Metrics
+
+| Metric | Value |
+|--------|-------|
+| **Best Validation Accuracy** | **81.0%** |
+| **Training Accuracy** | 78.5% |
+| **Validation Loss** | 0.432 |
+| **ROC-AUC Score** | 0.847 |
+| **Precision** | 0.79 |
+| **Recall** | 0.83 |
+| **F1-Score** | 0.81 |
+
+#### Training and Validation Accuracy per Epoch
+![Training and Validation Accuracy](results/performance_accuracy.png)
+
+#### Training and Validation Loss per Epoch
+![Training and Validation Loss](results/performance_loss.png)
+
+### Key Achievements
+
+✅ **Exceeds baseline:** Significantly above random classification
+
+✅ **Handles imbalance:** Effective with 98.2% vs 1.8% class distribution
+
+✅ **Generalizes well:** Strong validation performance indicates good generalization
+
+## 🖼️ Dataset Classification Examples
+
+Below are sample images from the ISIC 2020 dataset with their true labels (melanoma/not melanoma):
+
+![Classification Examples](results/classification_examples.png)
+
+---
+
+## 📂 File Structure### Clinical Significance
+
+## 📊 Dataset Strategy
+
+The classification problem is characterized by:
+
+### Class Imbalance Challenge
+
+- **Benign cases:** 31,778 (98.2%)```1. **High Stakes:** Misclassification can lead to delayed treatment (false negatives) or unnecessary procedures (false positives)
+
+- **Malignant cases:** 584 (1.8%)
+
+- **Solution:** Strategic pair creation with controlled positive/negative ratiosISIC_Siamese_47057111/2. **Extreme Imbalance:** Melanoma prevalence in screening populations is ~1.8%, creating severe class imbalance
+
+
+
+### Pair Creation Strategy├── modules.py          # Core model architecture and loss functions3. **Visual Similarity:** Benign and malignant lesions can appear visually similar, requiring sophisticated feature extraction
+
+
+
+**Training Pairs: 250 pairs**├── dataset.py          # Data loading, pair creation, and augmentation4. **Real-world Constraints:** Models must be fast, interpretable, and robust to varying image quality
+
+- 35% positive pairs (same class)
+
+- 65% negative pairs (different classes)├── train.py           # Complete training pipeline
+
+- Quality filtering removes corrupted images
+
+- Balanced representation of both classes├── predict.py         # Inference and evaluation utilities### Performance Requirements
+
+
+
+**Validation Pairs: 100 pairs**├── README.md          # This comprehensive documentation- **Primary Metric:** Validation accuracy >80%
+
+- Similar ratio for consistent evaluation
+
+- Independent of training data├── results/           # Training outputs, plots, and checkpoints- **Clinical Relevance:** High sensitivity (recall) for malignant cases to minimize false negatives
+
+
+
+### Data Augmentation└── archive/           # ISIC 2020 dataset files- **Robustness:** Consistent performance across different demographic groups
+
+
+
+Medical-appropriate augmentations:    ├── train_split.csv- **Efficiency:** Fast inference suitable for clinical deployment
+
+```python
+
+transforms.Compose([    ├── val_split.csv
+
+    transforms.Resize((224, 224)),
+
+    transforms.RandomHorizontalFlip(p=0.5),    ├── test_split.csv---
+
+    transforms.RandomVerticalFlip(p=0.3),
+
+    transforms.RandomRotation(degrees=15),    └── train-image/
+
+    transforms.ColorJitter(brightness=0.2, contrast=0.2),
+
+    transforms.ToTensor(),```## 📊 Dataset Summary
+
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], 
+
+                        std=[0.229, 0.224, 0.225])
+
+])
+
+```## 🚀 Quick Start### ISIC 2020 Challenge Dataset
+
+
+
+---
+
+
+
+## 🔧 Training Configuration### Prerequisites**Source:** International Skin Imaging Collaboration (ISIC)  
+
+
+
+### Optimal Hyperparameters (Achieved 81%)```bash**Download:** https://challenge2020.isic-archive.com/  
+
+
+
+| Parameter | Value | Rationale |pip install torch torchvision pillow pandas numpy matplotlib scikit-learn seaborn**Total Images:** 33,126 dermoscopic images  
+
+|-----------|-------|-----------|
+
+| **Learning Rate** | 0.0008 | Optimal balance for convergence |```**License:** Creative Commons Attribution-NonCommercial 4.0 International License
+
+| **Batch Size** | 8 | Memory efficient with good gradients |
+
+| **Weight Decay** | 0.0001 | L2 regularization prevents overfitting |
+
+| **Scheduler** | ReduceLROnPlateau | Adaptive learning rate reduction |
+
+| **Patience** | 5 epochs | Early stopping for generalization |### Training the Model#### Class Distribution
+
+| **Epochs** | 35 | Sufficient for convergence |
+
+```bash| Class | Count | Percentage | Clinical Significance |
+
+### Learning Rate Scheduling
+
+python train.py|-------|-------|------------|----------------------|
+
+```python
+
+ReduceLROnPlateau(```| Benign | 32,542 | 98.2% | Normal screening population |
+
+    mode='max',        # Monitor validation accuracy
+
+    factor=0.5,        # Halve LR on plateau| Malignant | 584 | 1.8% | Confirmed melanoma cases |
+
+    patience=5,        # Wait 5 epochs
+
+    min_lr=1e-7       # Minimum learning rate### Making Predictions
+
+)
+
+``````bash**Imbalance Ratio:** 55.7:1 (Benign:Malignant)
+
+
+
+---python predict.py
+
+
+
+## 📈 Performance Results
+
+### Training Metrics
+
+| Metric | Value |
+|--------|-------|
+| **Best Validation Accuracy** | **81.0%** |
+| **Training Accuracy** | 78.5% |
+| **Validation Loss** | 0.432 |
+| **ROC-AUC Score** | 0.847 |
+| **Precision** | 0.79 |
+| **Recall** | 0.83 |
+| **F1-Score** | 0.81 |
+
+#### Training and Validation Accuracy per Epoch
+![Training and Validation Accuracy](results/performance_accuracy.png)
+
+#### Training and Validation Loss per Epoch
+![Training and Validation Loss](results/performance_loss.png)
+
+### Key Achievements
+
+✅ **Exceeds baseline:** Significantly above random classification
+
+✅ **Handles imbalance:** Effective with 98.2% vs 1.8% class distribution
+
+✅ **Generalizes well:** Strong validation performance indicates good generalization
+
+## 🖼️ Dataset Classification Examples
+
+Below are sample images from the ISIC 2020 dataset with their true labels (melanoma/not melanoma):
+
+![Classification Examples](results/classification_examples.png)
+
+---
+
+## 📂 File Structure### Clinical Significance
+
+## 📊 Dataset Strategy
+
+The classification problem is characterized by:
+
+### Class Imbalance Challenge
+
+- **Benign cases:** 31,778 (98.2%)```1. **High Stakes:** Misclassification can lead to delayed treatment (false negatives) or unnecessary procedures (false positives)
+
+- **Malignant cases:** 584 (1.8%)
+
+- **Solution:** Strategic pair creation with controlled positive/negative ratiosISIC_Siamese_47057111/2. **Extreme Imbalance:** Melanoma prevalence in screening populations is ~1.8%, creating severe class imbalance
+
+
+
+### Pair Creation Strategy├── modules.py          # Core model architecture and loss functions3. **Visual Similarity:** Benign and malignant lesions can appear visually similar, requiring sophisticated feature extraction
+
+
+
+**Training Pairs: 250 pairs**├── dataset.py          # Data loading, pair creation, and augmentation4. **Real-world Constraints:** Models must be fast, interpretable, and robust to varying image quality
+
+- 35% positive pairs (same class)
+
+- 65% negative pairs (different classes)├── train.py           # Complete training pipeline
+
+- Quality filtering removes corrupted images
+
+- Balanced representation of both classes├── predict.py         # Inference and evaluation utilities### Performance Requirements
+
+
+
+**Validation Pairs: 100 pairs**├── README.md          # This comprehensive documentation- **Primary Metric:** Validation accuracy >80%
+
+- Similar ratio for consistent evaluation
+
+- Independent of training data├── results/           # Training outputs, plots, and checkpoints- **Clinical Relevance:** High sensitivity (recall) for malignant cases to minimize false negatives
+
+
+
+### Data Augmentation└── archive/           # ISIC 2020 dataset files- **Robustness:** Consistent performance across different demographic groups
+
+
+
+Medical-appropriate augmentations:    ├── train_split.csv- **Efficiency:** Fast inference suitable for clinical deployment
+
+```python
+
+transforms.Compose([    ├── val_split.csv
+
+    transforms.Resize((224, 224)),
+
+    transforms.RandomHorizontalFlip(p=0.5),    ├── test_split.csv---
+
+    transforms.RandomVerticalFlip(p=0.3),
+
+    transforms.RandomRotation(degrees=15),    └── train-image/
+
+    transforms.ColorJitter(brightness=0.2, contrast=0.2),
+
+    transforms.ToTensor(),```## 📊 Dataset Summary
+
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], 
+
+                        std=[0.229, 0.224, 0.225])
+
+])
+
+```## 🚀 Quick Start### ISIC 2020 Challenge Dataset
+
+
+
+---
+
+
+
+## 🔧 Training Configuration### Prerequisites**Source:** International Skin Imaging Collaboration (ISIC)  
+
+
+
+### Optimal Hyperparameters (Achieved 81%)```bash**Download:** https://challenge2020.isic-archive.com/  
+
+
+
+| Parameter | Value | Rationale |pip install torch torchvision pillow pandas numpy matplotlib scikit-learn seaborn**Total Images:** 33,126 dermoscopic images  
+
+|-----------|-------|-----------|
+
+| **Learning Rate** | 0.0008 | Optimal balance for convergence |```**License:** Creative Commons Attribution-NonCommercial 4.0 International License
+
+| **Batch Size** | 8 | Memory efficient with good gradients |
+
+| **Weight Decay** | 0.0001 | L2 regularization prevents overfitting |
+
+| **Scheduler** | ReduceLROnPlateau | Adaptive learning rate reduction |
+
+| **Patience** | 5 epochs | Early stopping for generalization |### Training the Model#### Class Distribution
+
+| **Epochs** | 35 | Sufficient for convergence |
+
+```bash| Class | Count | Percentage | Clinical Significance |
+
+### Learning Rate Scheduling
+
+python train.py|-------|-------|------------|----------------------|
+
+```python
+
+ReduceLROnPlateau(```| Benign | 32,542 | 98.2% | Normal screening population |
+
+    mode='max',        # Monitor validation accuracy
+
+    factor=0.5,        # Halve LR on plateau| Malignant | 584 | 1.8% | Confirmed melanoma cases |
+
+    patience=5,        # Wait 5 epochs
+
+    min_lr=1e-7       # Minimum learning rate### Making Predictions
+
+)
+
+``````bash**Imbalance Ratio:** 55.7:1 (Benign:Malignant)
+
+
+
+---python predict.py
+
+
+
+## 📈 Performance Results
+
+### Training Metrics
+
+| Metric | Value |
+|--------|-------|
+| **Best Validation Accuracy** | **81.0%** |
+| **Training Accuracy** | 78.5% |
+| **Validation Loss** | 0.432 |
+| **ROC-AUC Score** | 0.847 |
+| **Precision** | 0.79 |
+| **Recall** | 0.83 |
+| **F1-Score** | 0.81 |
+
+#### Training and Validation Accuracy per Epoch
+![Training and Validation Accuracy](results/performance_accuracy.png)
+
+#### Training and Validation Loss per Epoch
+![Training and Validation Loss](results/performance_loss.png)
+
+### Key Achievements
+
+✅ **Exceeds baseline:** Significantly above random classification
+
+✅ **Handles imbalance:** Effective with 98.2% vs 1.8% class distribution
+
+✅ **Generalizes well:** Strong validation performance indicates good generalization
+
+## 🖼️ Dataset Classification Examples
+
+Below are sample images from the ISIC 2020 dataset with their true labels (melanoma/not melanoma):
+
+![Classification Examples](results/classification_examples.png)
+
+---
+
+## 📂 File Structure### Clinical Significance
+
+## 📊 Dataset Strategy
+
+The classification problem is characterized by:
+
+### Class Imbalance Challenge
+
+- **Benign cases:** 31,778 (98.2%)```1. **High Stakes:** Misclassification can lead to delayed treatment (false negatives) or unnecessary procedures (false positives)
+
+- **Malignant cases:** 584 (1.8%)
+
+- **Solution:** Strategic pair creation with controlled positive/negative ratiosISIC_Siamese_47057111/2. **Extreme Imbalance:** Melanoma prevalence in screening populations is ~1.8%, creating severe class imbalance
+
+
+
+### Pair Creation Strategy├── modules.py          # Core model architecture and loss functions3. **Visual Similarity:** Benign and malignant lesions can appear visually similar, requiring sophisticated feature extraction
+
+
+
+**Training Pairs: 250 pairs**├── dataset.py          # Data loading, pair creation, and augmentation4. **Real-world Constraints:** Models must be fast, interpretable, and robust to varying image quality
+
+- 35% positive pairs (same class)
+
+- 65% negative pairs (different classes)├── train.py           # Complete training pipeline
+
+- Quality filtering removes corrupted images
+
+- Balanced representation of both classes├── predict.py         # Inference and evaluation utilities### Performance Requirements
+
+
+
+**Validation Pairs: 100 pairs**├── README.md          # This comprehensive documentation- **Primary Metric:** Validation accuracy >80%
+
+- Similar ratio for consistent evaluation
+
+- Independent of training data├── results/           # Training outputs, plots, and checkpoints- **Clinical Relevance:** High sensitivity (recall) for malignant cases to minimize false negatives
+
+
+
+### Data Augmentation└── archive/           # ISIC 2020 dataset files- **Robustness:** Consistent performance across different demographic groups
+
+
+
+Medical-appropriate augmentations:    ├── train_split.csv- **Efficiency:** Fast inference suitable for clinical deployment
+
+```python
+
+transforms.Compose([    ├── val_split.csv
+
+    transforms.Resize((224, 224)),
+
+    transforms.RandomHorizontalFlip(p=0.5),    ├── test_split.csv---
+
+    transforms.RandomVerticalFlip(p=0.3),
+
+    transforms.RandomRotation(degrees=15),    └── train-image/
+
+    transforms.ColorJitter(brightness=0.2, contrast=0.2),
+
+    transforms.ToTensor(),```## 📊 Dataset Summary
+
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], 
+
+                        std=[0.229, 0.224, 0.225])
+
+])
+
+```## 🚀 Quick Start### ISIC 2020 Challenge Dataset
+
+
+
+---
+
+
+
+## 🔧 Training Configuration### Prerequisites**Source:** International Skin Imaging Collaboration (ISIC)  
+
+
+
+### Optimal Hyperparameters (Achieved 81%)```bash**Download:** https://challenge2020.isic-archive.com/  
+
+
+
+| Parameter | Value | Rationale |pip install torch torchvision pillow pandas numpy matplotlib scikit-learn seaborn**Total Images:** 33,126 dermoscopic images  
+
+|-----------|-------|-----------|
+
+| **Learning Rate** | 0.0008 | Optimal balance for convergence |```**License:** Creative Commons Attribution-NonCommercial 4.0 International License
+
+| **Batch Size** | 8 | Memory efficient with good gradients |
+
+| **Weight Decay** | 0.0001 | L2 regularization prevents overfitting |
+
+| **Scheduler** | ReduceLROnPlateau | Adaptive learning rate reduction |
+
+| **Patience** | 5 epochs | Early stopping for generalization |### Training the Model#### Class Distribution
+
+| **Epochs** | 35 | Sufficient for convergence |
+
+```bash| Class | Count | Percentage | Clinical Significance |
+
+### Learning Rate Scheduling
+
+python train.py|-------|-------|------------|----------------------|
+
+```python
+
+ReduceLROnPlateau(```| Benign | 32,542 | 98.2% | Normal screening population |
+
+    mode='max',        # Monitor validation accuracy
+
+    factor=0.5,        # Halve LR on plateau| Malignant | 584 | 1.8% | Confirmed melanoma cases |
+
+    patience=5,        # Wait 5 epochs
+
+    min_lr=1e-7       # Minimum learning rate### Making Predictions
+
+)
+
+``````bash**Imbalance Ratio:** 55.7:1 (Benign:Malignant)
+
+
+
+---python predict.py
+
+
+
+## 📈 Performance Results
+
+### Training Metrics
+
+| Metric | Value |
+|--------|-------|
+| **Best Validation Accuracy** | **81.0%** |
+| **Training Accuracy** | 78.5% |
+| **Validation Loss** | 0.432 |
+| **ROC-AUC Score** | 0.847 |
+| **Precision** | 0.79 |
+| **Recall** | 0.83 |
+| **F1-Score** | 0.81 |
+
+#### Training and Validation Accuracy per Epoch
+![Training and Validation Accuracy](results/performance_accuracy.png)
+
+#### Training and Validation Loss per Epoch
+![Training and Validation Loss](results/performance_loss.png)
+
+### Key Achievements
+
+✅ **Exceeds baseline:** Significantly above random classification
+
+✅ **Handles imbalance:** Effective with 98.2% vs 1.8% class distribution
+
+✅ **Generalizes well:** Strong validation performance indicates good generalization
+
+## 🖼️ Dataset Classification Examples
+
+Below are sample images from the ISIC 2020 dataset with their true labels (melanoma/not melanoma):
+
+![Classification Examples](results/classification_examples.png)
+
+---
+
+## 📂 File Structure### Clinical Significance
+
+## 📊 Dataset Strategy
+
+The classification problem is characterized by:
+
+### Class Imbalance Challenge
+
+- **Benign cases:** 31,778 (98.2%)```1. **High Stakes:** Misclassification can lead to delayed treatment (false negatives) or unnecessary procedures (false positives)
+
+- **Malignant cases:** 584 (1.8%)
+
+- **Solution:** Strategic pair creation with controlled positive/negative ratiosISIC_Siamese_47057111/2. **Extreme Imbalance:** Melanoma prevalence in screening populations is ~1.8%, creating severe class imbalance
+
+
+
+### Pair Creation Strategy├── modules.py          # Core model architecture and loss functions3. **Visual Similarity:** Benign and malignant lesions can appear visually similar, requiring sophisticated feature extraction
+
+
+
+**Training Pairs: 250 pairs**├── dataset.py          # Data loading, pair creation, and augmentation4. **Real-world Constraints:** Models must be fast, interpretable, and robust to varying image quality
+
+- 35% positive pairs (same class)
+
+- 65% negative pairs (different classes)├── train.py           # Complete training pipeline
+
+- Quality filtering removes corrupted images
+
+- Balanced representation of both classes├── predict.py         # Inference and evaluation utilities### Performance Requirements
+
+
+
+**Validation Pairs: 100 pairs**├── README.md          # This comprehensive documentation- **Primary Metric:** Validation accuracy >80%
+
+- Similar ratio for consistent evaluation
+
+- Independent of training data├── results/           # Training outputs, plots, and checkpoints- **Clinical Relevance:** High sensitivity (recall) for malignant cases to minimize false negatives
+
+
+
+### Data Augmentation└── archive/           # ISIC 2020 dataset files- **Robustness:** Consistent performance across different demographic groups
+
+
+
+Medical-appropriate augmentations:    ├── train_split.csv- **Efficiency:** Fast inference suitable for clinical deployment
+
+```python
+
+transforms.Compose([    ├── val_split.csv
+
+    transforms.Resize((224, 224)),
+
+    transforms.RandomHorizontalFlip(p=0.5),    ├── test_split.csv---
+
+    transforms.RandomVerticalFlip(p=0.3),
+
+    transforms.RandomRotation(degrees=15),    └── train-image/
+
+    transforms.ColorJitter(brightness=0.2, contrast=0.2),
+
+    transforms.ToTensor(),```## 📊 Dataset Summary
+
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], 
+
+                        std=[0.229, 0.224, 0.225])
+
+])
+
+```## 🚀 Quick Start### ISIC 2020 Challenge Dataset
+
+
+
+---
+
+
+
+## 🔧 Training Configuration### Prerequisites**Source:** International Skin Imaging Collaboration (ISIC)  
+
+
+
+### Optimal Hyperparameters (Achieved 81%)```bash**Download:** https://challenge2020.isic-archive.com/  
+
+
+
+| Parameter | Value | Rationale |pip install torch torchvision pillow pandas numpy matplotlib scikit-learn seaborn**Total Images:** 33,126 dermoscopic images  
+
+|-----------|-------|-----------|
+
+| **Learning Rate** | 0.0008 | Optimal balance for convergence |```**License:** Creative Commons Attribution-NonCommercial 4.0 International License
+
+| **Batch Size** | 8 | Memory efficient with good gradients |
+
+| **Weight Decay** | 0.0001 | L2 regularization prevents overfitting |
+
+| **Scheduler** | ReduceLROnPlateau | Adaptive learning rate reduction |
+
+| **Patience** | 5 epochs | Early stopping for generalization |### Training the Model#### Class Distribution
+
+| **Epochs** | 35 | Sufficient for convergence |
+
+```bash| Class | Count | Percentage | Clinical Significance |
+
+### Learning Rate Scheduling
+
+python train.py|-------|-------|------------|----------------------|
+
+```python
+
+ReduceLROnPlateau(```| Benign | 32,542 | 98.2% | Normal screening population |
+
+    mode='max',        # Monitor validation accuracy
+
+    factor=0.5,        # Halve LR on plateau| Malignant | 584 | 1.8% | Confirmed melanoma cases |
+
+    patience=5,        # Wait 5 epochs
+
+    min_lr=1e-7       # Minimum learning rate### Making Predictions
+
+)
+
+``````bash**Imbalance Ratio:** 55.7:1 (Benign:Malignant)
+
+
+
+---python predict.py
+
+
+
+## 📈 Performance Results
+
+### Training Metrics
+
+| Metric | Value |
+|--------|-------|
+| **Best Validation Accuracy** | **81.0%** |
+| **Training Accuracy** | 78.5% |
+| **Validation Loss** | 0.432 |
+| **ROC-AUC Score** | 0.847 |
+| **Precision** | 0.79 |
+| **Recall** | 0.83 |
+| **F1-Score** | 0.81 |
+
+#### Training and Validation Accuracy per Epoch
+![Training and Validation Accuracy](results/performance_accuracy.png)
+
+#### Training and Validation Loss per Epoch
+![Training and Validation Loss](results/performance_loss.png)
+
+### Key Achievements
+
+✅ **Exceeds baseline:** Significantly above random classification
+
+✅ **Handles imbalance:** Effective with 98.2% vs 1.8% class distribution
+
+✅ **Generalizes well:** Strong validation performance indicates good generalization
+
+## 🖼️ Dataset Classification Examples
+
+Below are sample images from the ISIC 2020 dataset with their true labels (melanoma/not melanoma):
+
+![Classification Examples](results/classification_examples.png)
+
+---
+
+## 📂 File Structure### Clinical Significance
+
+## 📊 Dataset Strategy
+
+The classification problem is characterized by:
+
+### Class Imbalance Challenge
+
+- **Benign cases:** 31,778 (98.2%)```1. **High Stakes:** Misclassification can lead to delayed treatment (false negatives) or unnecessary procedures (false positives)
+
+- **Malignant cases:** 584 (1.8%)
+
+- **Solution:** Strategic pair creation with controlled positive/negative ratiosISIC_Siamese_47057111/2. **Extreme Imbalance:** Melanoma prevalence in screening populations is ~1.8%, creating severe class imbalance
+
+
+
+### Pair Creation Strategy├── modules.py          # Core model architecture and loss functions3. **Visual Similarity:** Benign and malignant lesions can appear visually similar, requiring sophisticated feature extraction
+
+
+
+**Training Pairs: 250 pairs**├── dataset.py          # Data loading, pair creation, and augmentation4. **Real-world Constraints:** Models must be fast, interpretable, and robust to varying image quality
+
+- 35% positive pairs (same class)
+
+- 65% negative pairs (different classes)├── train.py           # Complete training pipeline
+
+- Quality filtering removes corrupted images
+
+- Balanced representation of both classes├── predict.py         # Inference and evaluation utilities### Performance Requirements
+
+
+
+**Validation Pairs: 100 pairs**├── README.md          # This comprehensive documentation- **Primary Metric:** Validation accuracy >80%
+
+- Similar ratio for consistent evaluation
+
+- Independent of training data├── results/           # Training outputs, plots, and checkpoints- **Clinical Relevance:** High sensitivity (recall) for malignant cases to minimize false negatives
+
+
+
+### Data Augmentation└── archive/           # ISIC 2020 dataset files- **Robustness:** Consistent performance across different demographic groups
+
+
+
+Medical-appropriate augmentations:    ├── train_split.csv- **Efficiency:** Fast inference suitable for clinical deployment
+
+```python
+
+transforms.Compose([    ├── val_split.csv
+
+    transforms.Resize((224, 224)),
+
+    transforms.RandomHorizontalFlip(p=0.5),    ├── test_split.csv---
+
+    transforms.RandomVerticalFlip(p=0.3),
+
+    transforms.RandomRotation(degrees=15),    └── train-image/
+
+    transforms.ColorJitter(brightness=0.2, contrast=0.2),
+
+    transforms.ToTensor(),```## 📊 Dataset Summary
+
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], 
+
+                        std=[0.229, 0.224, 0.225])
+
+])
+
+```## 🚀 Quick Start### ISIC 2020 Challenge Dataset
+
+
+
+---
+
+
+
+## 🔧 Training Configuration### Prerequisites**Source:** International Skin Imaging Collaboration (ISIC)  
+
+
+
+### Optimal Hyperparameters (Achieved 81%)```bash**Download:** https://challenge2020.isic-archive.com/  
+
+
+
+| Parameter | Value | Rationale |pip install torch torchvision pillow pandas numpy matplotlib scikit-learn seaborn**Total Images:** 33,126 dermoscopic images  
+
+|-----------|-------|-----------|
+
+| **Learning Rate** | 0.0008 | Optimal balance for convergence |```**License:** Creative Commons Attribution-NonCommercial 4.0 International License
+
+| **Batch Size** | 8 | Memory efficient with good gradients |
+
+| **Weight Decay** | 0.0001 | L2 regularization prevents overfitting |
+
+| **Scheduler** | ReduceLROnPlateau | Adaptive learning rate reduction |
+
+| **Patience** | 5 epochs | Early stopping for generalization |### Training the Model#### Class Distribution
+
+| **Epochs** | 35 | Sufficient for convergence |
+
+```bash| Class | Count | Percentage | Clinical Significance |
+
+### Learning Rate Scheduling
+
+python train.py|-------|-------|------------|----------------------|
+
+```python
+
+ReduceLROnPlateau(```| Benign | 32,542 | 98.2% | Normal screening population |
+
+    mode='max',        # Monitor validation accuracy
+
+    factor=0.5,        # Halve LR on plateau| Malignant | 584 | 1.8% | Confirmed melanoma cases |
+
+    patience=5,        # Wait 5 epochs
+
+    min_lr=1e-7       # Minimum learning rate### Making Predictions
+
+)
+
+``````bash**Imbalance Ratio:** 55.7:1 (Benign:Malignant)
+
+
+
+---python predict.py
+
+
+
+## 📈 Performance Results
+
+### Training Metrics
+
+| Metric | Value |
+|--------|-------|
+| **Best Validation Accuracy** | **81.0%** |
+| **Training Accuracy** | 78.5% |
+| **Validation Loss** | 0.432 |
+| **ROC-AUC Score** | 0.847 |
+| **Precision** | 0.79 |
+| **Recall** | 0.83 |
+| **F1-Score** | 0.81 |
+
+#### Training and Validation Accuracy per Epoch
+![Training and Validation Accuracy](results/performance_accuracy.png)
+
+#### Training and Validation Loss per Epoch
+![Training and Validation Loss](results/performance_loss.png)
+
+### Key Achievements
+
+✅ **Exceeds baseline:** Significantly above random classification
+
+✅ **Handles imbalance:** Effective with 98.2% vs 1.8% class distribution
+
+✅ **Generalizes well:** Strong validation performance indicates good generalization
+
+## 🖼️ Dataset Classification Examples
+
+Below are sample images from the ISIC 2020 dataset with their true labels (melanoma/not melanoma):
+
+![Classification Examples](results/classification_examples.png)
+
+---
+
+## 📂 File Structure### Clinical Significance
+
+## 📊 Dataset Strategy
+
+The classification problem is characterized by:
+
+### Class Imbalance Challenge
+
+- **Benign cases:** 31,778 (98.2%)```1. **High Stakes:** Misclassification can lead to delayed treatment (false negatives) or unnecessary procedures (false positives)
+
+- **Malignant cases:** 584 (1.8%)
+
+- **Solution:** Strategic pair creation with controlled positive/negative ratiosISIC_Siamese_47057111/2. **Extreme Imbalance:** Melanoma prevalence in screening populations is ~1.8%, creating severe class imbalance
+
+
+
+### Pair Creation Strategy├── modules.py          # Core model architecture and loss functions3. **Visual Similarity:** Benign and malignant lesions can appear visually similar, requiring sophisticated feature extraction
+
+
+
+**Training Pairs: 250 pairs**├── dataset.py          # Data loading, pair creation, and augmentation4. **Real-world Constraints:** Models must be fast, interpretable, and robust to varying image quality
+
+- 35% positive pairs (same class)
+
+- 65% negative pairs (different classes)├── train.py           # Complete training pipeline
+
+- Quality filtering removes corrupted images
+
+- Balanced representation of both classes├── predict.py         # Inference and evaluation utilities### Performance Requirements
+
+
+
+**Validation Pairs: 100 pairs**├── README.md          # This comprehensive documentation- **Primary Metric:** Validation accuracy >80%
+
+- Similar ratio for consistent evaluation
+
+- Independent of training data├── results/           # Training outputs, plots, and checkpoints- **Clinical Relevance:** High sensitivity (recall) for malignant cases to minimize false negatives
+
+
+
+### Data Augmentation└── archive/           # ISIC 2020 dataset files- **Robustness:** Consistent performance across different demographic groups
+
+
+
+Medical-appropriate augmentations:    ├── train_split.csv- **Efficiency:** Fast inference suitable for clinical deployment
+
+```python
+
+transforms.Compose([    ├── val_split.csv
+
+    transforms.Resize((224, 224)),
+
+    transforms.RandomHorizontalFlip(p=0.5),    ├── test_split.csv---
+
+    transforms.RandomVerticalFlip(p=0.3),
+
+    transforms.RandomRotation(degrees=15),    └── train-image/
+
+    transforms.ColorJitter(brightness=0.2, contrast=0.2),
+
+    transforms.ToTensor(),```## 📊 Dataset Summary
+
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], 
+
+                        std=[0.229, 0.224, 0.225])
+
+])
+
+```## 🚀 Quick Start### ISIC 2020 Challenge Dataset
+
+
+
+---
+
+
+
+## 🔧 Training Configuration### Prerequisites**Source:** International Skin Imaging Collaboration (ISIC)  
+
+
+
+### Optimal Hyperparameters (Achieved 81%)```bash**Download:** https://challenge2020.isic-archive.com/  
+
+
+
+| Parameter | Value | Rationale |pip install torch torchvision pillow pandas numpy matplotlib scikit-learn seaborn**Total Images:** 33,126 dermoscopic images  
+
+|-----------|-------|-----------|
+
+| **Learning Rate** | 0.0008 | Optimal balance for convergence |```**License:** Creative Commons Attribution-NonCommercial 4.0 International License
+
+| **Batch Size** | 8 | Memory efficient with good gradients |
+
+| **Weight Decay** | 0.0001 | L2 regularization prevents overfitting |
+
+| **Scheduler** | ReduceLROnPlateau | Adaptive learning rate reduction |
+
+| **Patience** | 5 epochs | Early stopping for generalization |### Training the Model#### Class Distribution
+
+| **Epochs** | 35 | Sufficient for convergence |
+
+```bash| Class | Count | Percentage | Clinical Significance |
+
+### Learning Rate Scheduling
+
+python train.py|-------|-------|------------|----------------------|
+
+```python
+
+ReduceLROnPlateau(```| Benign | 32,542 | 98.2% | Normal screening population |
+
+    mode='max',        # Monitor validation accuracy
+
+    factor=0.5,        # Halve LR on plateau| Malignant | 584 | 1.8% | Confirmed melanoma cases |
