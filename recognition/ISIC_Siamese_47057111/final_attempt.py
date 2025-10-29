@@ -278,10 +278,10 @@ class FinalAttemptTrainer:
                     log_with_time(f"🏆 TARGET ACHIEVED: {val_acc:.2f}% >= 80%!")
                     break
         
-        log_with_time(f"\n✅ Final attempt completed! Best accuracy: {self.best_accuracy:.2f}%")
+        log_with_time(f"\nFinal attempt completed! Best accuracy: {self.best_accuracy:.2f}%")
 
 def main():
-    log_with_time("🎯 FINAL ATTEMPT - 76.25% Model + Optimal Learning Rate")
+    log_with_time("FINAL ATTEMPT - 76.25% Model + Optimal Learning Rate")
     
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     log_with_time(f"Device: {device}")

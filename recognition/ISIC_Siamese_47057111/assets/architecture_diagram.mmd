@@ -1,0 +1,16 @@
+flowchart TD
+  A1[Image 1<br/>224x224] --> B1[ResNet18 Backbone<br/>shared, FC removed]
+  A2[Image 2<br/>224x224] --> B2[ResNet18 Backbone<br/>shared, FC removed]
+  B1 --> C1[Embedding Network<br/>512→256→128]
+  B2 --> C2[Embedding Network<br/>512→256→128]
+  C1 --> D[Concatenate<br/>Embeddings]
+  C2 --> D
+  D --> E[Comparison Network<br/>256→512→128→1]
+  E --> F[Output: Similarity Score<br/>sigmoid]
+
+  style B1 fill:#e1f5ff
+  style B2 fill:#e1f5ff
+  style C1 fill:#fff4e1
+  style C2 fill:#fff4e1
+  style E fill:#e8f5e9
+  style F fill:#fce4ec
