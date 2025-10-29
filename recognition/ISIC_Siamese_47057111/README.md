@@ -31,7 +31,7 @@
 
 ##  Achievement Summary
 
-** VALIDATION ACCURACY: 81.00%**
+VALIDATION ACCURACY: 81.00%
 
 This project implements an advanced Siamese network approach for melanoma classification using the ISIC 2020 dataset, achieving high validation accuracy through innovative similarity learning techniques.
 
@@ -60,15 +60,15 @@ My solution uses a **Siamese Network** approach, which learns to distinguish bet
 
 Siamese networks are particularly suited to the extreme class imbalance in this dataset (98.2% benign vs 1.8% malignant) because they learn a similarity metric rather than requiring many examples of each class. By training on pairs of images, the network learns to identify whether two lesions are similar (both benign or both malignant) rather than classifying individual images directly.
 
-This approach is more robust when one class has significantly fewer samples, as it leverages the relationships between examples rather than absolute class membership. For medical imaging with rare conditions, this pair-based learning strategy enables the model to extract discriminative features from limited malignant samples by creating multiple training examples through strategic pairing—a single malignant image can generate multiple training pairs when combined with different benign images.
+This approach is stronger when one class has significantly fewer samples, as it leverages the relationships between examples rather than absolute class membership. For medical imaging with rare conditions, this pair-based learning strategy enables the model to extract discriminative features from limited malignant samples by creating multiple training examples through strategic pairing—a single malignant image can generate multiple training pairs when combined with different benign images.
 
 ### Data Preprocessing and Augmentation
 
-All dermoscopic images undergo standardized preprocessing:
+All dermoscopic images undergo standardised preprocessing:
 
 **Image Preprocessing:**
 - Resized to 224×224 pixels (ResNet18 input requirement)
-- Z-score normalization: `(image - mean) / std`
+- Z-score normalisation: `(image - mean) / std`
 - RGB color space preservation
 
 **Medical-Appropriate Augmentations:**
@@ -84,8 +84,8 @@ Note: Aggressive augmentations like extreme rotations (>30°) or elastic distort
 
 Image preprocessing choices follow dermoscopic imaging best practices:
 
-Normalization Strategy [1]:
-- Z-score normalization: $(\text{image} - \mu)/\sigma$ accounts for illumination differences across devices
+Normalisation Strategy [1]:
+- Z-score normalisation: $(\text{image} - \mu)/\sigma$ accounts for illumination differences across devices
 - Preserves relative intensity relationships important for melanoma color features
 
 Augmentation Rationale [2,3]:
@@ -96,10 +96,6 @@ Augmentation Rationale [2,3]:
 Why Not Aggressive Augmentation?
 Melanoma diagnosis relies on specific morphological features that must be preserved (border irregularity, asymmetry, color patterns like blue-white veil). Excessive warping or strong color shifts can degrade these cues.
 
-References:
-- [1] Codella, N. et al. "Skin Lesion Analysis Toward Melanoma Detection" (ISIC 2018)
-- [2] Tschandl, P. et al. "Data Augmentation in Dermatology" (J. Invest Dermatol., 2019)
-- [3] Perez, F. et al. "Data Augmentation for Skin Lesion Analysis" (ISIC Workshop, 2018)
 
 ### Architecture Design Rationale
 
@@ -139,7 +135,7 @@ $$ L_{\text{focal}} = -\alpha_t\,(1-p_t)^{\gamma}\,\log(p_t) $$
 
 Parameters:
 - $p_t$: Model's predicted probability for the true class
-- $\alpha = 0.7$: Class weight factor (emphasizes minority malignant class)
+- $\alpha = 0.7$: Class weight factor (emphasises minority malignant class)
 - $\gamma = 1.5$: Focusing parameter (down-weights easy examples, focuses on hard cases)
 - $\alpha_t = \alpha$ if label = 1 (similar pair), else $\alpha_t = 1-\alpha$
 
@@ -156,7 +152,7 @@ Standard cross-entropy can be dominated by easy benign examples in imbalanced da
 2. Forward Pass (model): Process both images through shared ResNet18; extract 512-d features; compress to 128-d embeddings.
 3. Similarity Computation: Concatenate embeddings to 256-d and pass through comparison net (256→512→128→1) to obtain a sigmoid score.
 4. Loss Calculation: Compute Weighted Focal Loss between predicted similarity and label; backprop through backbone, embedding, and comparison nets.
-5. Optimization (train.py): Adam (lr=0.0008, wd=0.0001); ReduceLROnPlateau (factor=0.5, patience=5); early stopping when no improvement.
+5. Optimisation (train.py): Adam (lr=0.0008, wd=0.0001); ReduceLROnPlateau (factor=0.5, patience=5); early stopping when no improvement.
 6. Validation: Evaluate on held-out pairs each epoch, save best checkpoint, and track accuracy/loss and classification metrics.
 
 ### Key Design Decisions
@@ -188,7 +184,7 @@ The model's performance is evaluated in the context of its intended use as a scr
 - False Negative Rate (55% on malignant class): While high, this is acceptable for initial screening when paired with expert confirmation
 - Recommended Workflow: Flag suspicious cases (predicted malignant) for dermatologist examination rather than providing autonomous diagnosis
 
-Comparison to Literature: Our 81% accuracy and 0.847 ROC-AUC are competitive with published Siamese network approaches on ISIC datasets, though below state-of-the-art ensemble methods (>90% accuracy) that use significantly larger training sets.
+Comparison to Literature: The 81% accuracy and 0.847 ROC-AUC are competitive with published Siamese network approaches on ISIC datasets, though below state-of-the-art ensemble methods (>90% accuracy) that use significantly larger training sets.
 
 ---
 
@@ -212,7 +208,7 @@ Training and validation curves are generated automatically and saved in the `res
 <div align="center">
   <img src="results/classification_examples.png" alt="Example Classification Images" />
   <br>
-  <em>Example Classification Images</em>
+  <em>Example Classification Images (Non-Melanoma Only)</em>
 </div>
 
 ---
@@ -274,14 +270,12 @@ If a confusion matrix image is generated during inference, save it under `result
 
 #### Clinical Implications
 - **False Positives:** 18% — leads to unnecessary biopsies but ensures safety
-- **False Negatives:** 55% — critical to minimize; current rate acceptable for screening tool
+- **False Negatives:** 55% — critical to minimise; current rate acceptable for screening tool
 - Model suitable for initial screening; dermatologist confirmation required
 
 ---
 
-## Customizing Paths for Your Machine
-
-**IMPORTANT:** Update all file and directory paths in scripts to match your local setup. Example (using only files that exist in this repo):
+Example (using only files that exist in this repo):
 
 - `--image COMP3710_A3/recognition/ISIC_Siamese_47057111/archive/train-image/ISIC_0082934.jpg`
 - `--checkpoint COMP3710_A3/recognition/ISIC_Siamese_47057111/checkpoints/final_attempt_best.pth`
@@ -291,7 +285,6 @@ If a confusion matrix image is generated during inference, save it under `result
 - `--val_csv COMP3710_A3/recognition/ISIC_Siamese_47057111/archive/val_split.csv`
 - `--image_dir COMP3710_A3/recognition/ISIC_Siamese_47057111/archive/train-image/`
 
-Paths in scripts are set for the provided folder structure, but you **must** change them to your own machine's locations for successful execution.
 
 ---
 
@@ -371,7 +364,7 @@ pip install -r requirements.txt
 
 1. **Download ISIC 2020 dataset from Kaggle Challenge**
 2. **Extract to `archive/` directory**
-3. **Organize structure:**
+3. **Organise structure:**
 ```
 ISIC_Siamese_47057111/
 ├── archive/
@@ -396,7 +389,7 @@ Split Configuration:
 Justification for Split Ratios:
 1. Small Pair Count (250 training pairs): Computationally efficient for dual-image processing; strategic sampling beats using all 33k+ possible pairs.
 2. Pair-Based Train/Val Split: No image overlap between splits to avoid leakage; stratified sampling maintains ~98.2%/1.8% class ratio.
-3. Large Test Set (1,000 images): Evaluates generalization on single-image classification, reflecting screening scenarios.
+3. Large Test Set (1,000 images): Evaluates generalisation on single-image classification, reflecting screening scenarios.
 4. 35/65 Positive/Negative Pairs: 35% positives for intra-class similarity, 65% negatives for inter-class discrimination; empirically optimal vs 50/50 or 20/80 (which achieved ~76–78%).
 
 Validation Strategy: Stratified sampling ensures clinical relevance of evaluation metrics by preserving class proportions.
@@ -436,7 +429,7 @@ python predict.py --input-dir archive/train-image/ --checkpoint checkpoints/fina
 | Batch Size       | 8        | Memory efficient for 224x224 images; provides stable gradients |
 | Weight Decay     | 0.0001   | Prevents overfitting on small pair dataset |
 | Scheduler        | ReduceLROnPlateau | Adaptive LR reduction on validation plateau (factor=0.5, patience=5) |
-| Patience         | 5 epochs | Early stopping balances training time vs generalization |
+| Patience         | 5 epochs | Early stopping balances training time vs generalisation |
 | Epochs           | 35       | Sufficient for convergence based on validation curve |
 | Loss Function    | WeightedFocalLoss | α=0.7 and γ=1.5 handle extreme imbalance; focal loss focuses on hard examples |
 
@@ -511,13 +504,13 @@ Documentation coverage:
 
 2. Dataset Bias
   - Model trained exclusively on ISIC 2020 dermoscopic images
-  - May not generalize to different imaging conditions, camera systems, or patient populations
+  - May not generalise to different imaging conditions, camera systems, or patient populations
   - Recommendation: Validate on institution-specific data before clinical deployment
 
 3. Computational Requirements
   - Inference requires GPU for reasonable speed (~50ms per pair on RTX 3090)
-  - Not optimized for edge deployment or mobile devices
-  - Alternative: Consider model quantization or distillation for deployment
+  - Not optimised for edge deployment or mobile devices
+  - Alternative: Consider model quantisation or distillation for deployment
 
 4. Pair-Based Inference Dependency
   - Classification requires comparison with reference images
@@ -575,7 +568,7 @@ To reproduce the 81.00% validation accuracy reported in this project:
   - Learning rate: 0.0008
   - Epochs: 35
   - Loss: WeightedFocalLoss (α=0.7, γ=1.5)
-  - Optimizer: Adam with weight decay 0.0001
+  - Optimiser: Adam with weight decay 0.0001
   - Scheduler: ReduceLROnPlateau (factor=0.5, patience=5)
 4. Expected training time: ~2 hours on RTX 3090, ~4-5 hours on RTX 2080 Ti
 
@@ -594,6 +587,10 @@ After training, verify results match:
 ---
 
 ## References
+- References:
+- [1] Codella, N. et al. "Skin Lesion Analysis Toward Melanoma Detection" (ISIC 2018)
+- [2] Tschandl, P. et al. "Data Augmentation in Dermatology" (J. Invest Dermatol., 2019)
+- [3] Perez, F. et al. "Data Augmentation for Skin Lesion Analysis" (ISIC Workshop, 2018)
 - Koch, G. et al. "Siamese Neural Networks for One-shot Image Recognition" (ICML 2015)
 - Lin, T. et al. "Focal Loss for Dense Object Detection" (ICCV 2017)
 - He, K. et al. "Deep Residual Learning for Image Recognition" (CVPR 2016) - ResNet18 backbone
@@ -609,4 +606,4 @@ After training, verify results match:
 
 ---
 
-*This README.md provides comprehensive documentation for academic evaluation and potential clinical deployment of the melanoma classification system.*
+*This project utilised AI tools, including GitHub Copilot, for code generation, documentation, and workflow assistance in accordance with academic integrity guidelines.*
