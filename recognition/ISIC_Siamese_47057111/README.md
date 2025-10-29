@@ -237,16 +237,6 @@ This corroborates the validation performance reported below and provides traceab
 
 -- Model checkpoints: `checkpoints/final_attempt_best.pth` (contains weights)
 
-<!-- Removed duplicate architecture diagram section to avoid redundancy -->
-
-### Inference Evidence (Validation/Test)
-Run the batch evaluation command in the Usage section to generate inference artifacts. After it completes, you will have:
-
-- `results/confusion_matrix.png` — confusion matrix image of predictions vs. ground truth
-- `results/prediction_report.txt` — precision, recall, F1-score per class and overall
-- `results/predictions.csv` — per-image predictions with confidence
-
-Tip for small local subsets: add `--per_class 1` to the command so the reference gallery builds even when only a few images exist.
 
 ### Inference Results (Test Set)
 - Run inference using `predict.py` after updating its internal paths (see Usage Instructions below)
@@ -262,11 +252,6 @@ Tip for small local subsets: add `--per_class 1` to the command so the reference
 | Recall                | 0.83    |
 | F1-Score              | 0.81    |
 
-#### Confusion Matrix Analysis
-If a confusion matrix image is generated during inference, save it under `results/`.
-
-- **Benign class:** Precision 82%, Recall 95%
-- **Malignant class:** Precision 79%, Recall 45%
 
 #### Clinical Implications
 - **False Positives:** 18% — leads to unnecessary biopsies but ensures safety
@@ -312,7 +297,7 @@ Example (using only files that exist in this repo):
          --checkpoint checkpoints/final_attempt_best.pth \
          --output results
        ```
-     - Batch evaluation (creates results/confusion_matrix.png, prediction_report.txt, predictions.csv):
+     - Batch evaluation:
        ```bash
        python predict.py \
          --input-dir archive/train-image/ \
@@ -321,7 +306,7 @@ Example (using only files that exist in this repo):
        ```
 
 3. **Metrics:**
-  - Precision, recall, F1-score, ROC-AUC, and confusion matrix are reported in the console and any figures you save under `results/`.
+  - Precision, recall, F1-score, ROC-AUC and are reported in the console and any figures you save under `results/`.
   - Clinical implications are discussed above.
 
 ---
@@ -415,7 +400,7 @@ Run `predict.py` with flags (examples below assume running from `recognition/ISI
 python predict.py --image archive/train-image/ISIC_0082934.jpg --checkpoint checkpoints/final_attempt_best.pth --output results
 ```
 
-- Batch evaluation on validation split (uses `archive/val_split.csv` by default and saves `results/confusion_matrix.png`):
+- Batch evaluation on validation split (uses `archive/val_split.csv` by default:
 ```bash
 python predict.py --input-dir archive/train-image/ --checkpoint checkpoints/final_attempt_best.pth --output results
 ```
@@ -458,7 +443,7 @@ ISIC_Siamese_47057111/
 
 All Python scripts include docstrings and inline comments in a consistent style.
 
-Example from modules (conceptual):
+Example from modules:
 ```
 class SiameseNetwork(nn.Module):
   """
@@ -476,7 +461,7 @@ class SiameseNetwork(nn.Module):
   """
 ```
 
-Example from dataset (conceptual):
+Example from dataset:
 ```
 def create_balanced_pairs(df, n_pairs, positive_ratio=0.35):
   """
